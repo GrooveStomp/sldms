@@ -13,6 +13,7 @@ import (
 
 var (
 	SlackUsername string
+	FilterText    string
 	Config        Cfg
 )
 
@@ -33,13 +34,14 @@ func main() {
 	flag.StringVar(&slackKey, "slack", "", "Slack API token")
 	flag.Parse()
 
-	if len(flag.Args()) < 1 {
-		fmt.Println("Usage: PROGRAM [OPTIONS] USER")
+	if len(flag.Args()) < 2 {
+		fmt.Println("Usage: PROGRAM [OPTIONS] USER FILTERTEXT")
 		fmt.Println("\tYou must have a valid .toml config file as well.")
 		os.Exit(1)
 	}
 
 	SlackUsername = flag.Args()[0]
+	FilterText = flag.Args()[1]
 
 	if _, err := toml.DecodeFile(*configFile, &Config); err != nil {
 		fmt.Println(err)
@@ -126,7 +128,7 @@ func FilterMsgs1On1(msgs []slack.Message) []slack.Message {
 	for i := range msgs {
 		msg := msgs[i]
 
-		if strings.Contains(msg.Text, Config.FilterText) {
+		if strings.Contains(msg.Text, FilterText) {
 			wanted = append(wanted, msg)
 		}
 	}
